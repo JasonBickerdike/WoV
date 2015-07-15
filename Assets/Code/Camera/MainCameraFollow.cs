@@ -24,7 +24,7 @@ public class MainCameraFollow : MonoBehaviour {
 		FollowPos = FollowThis.transform.position;
 
 		/*  This Section Is For Camera movement!*/
-		transform.position = Vector3.MoveTowards(transform.position, FollowPos, 0.07f);
+		transform.position = Vector3.MoveTowards(transform.position, FollowPos, BlendSpeed);
 
 
 
