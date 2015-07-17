@@ -2,7 +2,7 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Code\Camera\MainCameraFollow.cs">
     <Files>
-      <File FileName="Assets\Code\Camera\MainCameraFollow.cs" Line="19" Column="16" />
+      <File FileName="Assets\Code\Camera\MainCameraFollow.cs" Line="75" Column="3" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

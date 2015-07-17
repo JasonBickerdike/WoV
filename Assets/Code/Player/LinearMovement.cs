@@ -7,7 +7,7 @@ using System.Collections;
  * Package: WoV
  */
 
-namespace WoV
+namespace WoVEssentials
 {
 	/// <summary>
 	/// The player movement direction.
