@@ -1,8 +1,9 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Code\Camera\MainCameraFollow.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Code\Player\Temp_Linear_Movement.cs">
     <Files>
-      <File FileName="Assets\Code\Camera\MainCameraFollow.cs" Line="75" Column="3" />
+      <File FileName="Assets\Code\Player\Temp_Linear_Movement.cs" Line="23" Column="16" />
+      <File FileName="Assets\Code\Camera\MainCameraFollow.cs" Line="29" Column="3" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

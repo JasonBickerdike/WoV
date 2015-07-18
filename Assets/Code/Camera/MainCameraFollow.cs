@@ -5,6 +5,16 @@ namespace WoVEssentials {
 
 	public class MainCameraFollow : MonoBehaviour {
 
+		/* How To Interact With This Script!!! *\
+
+		 * Cutscenes should use a gameobject with lerp to move around
+		 * Set a reference to this script on it's *Awake* to MainCameraFollow.FollowThis
+		 * Set a child to the object it follows to set the direction the camera will look at
+		 * Set the child *LookAt* object to MainCameraFollow.LookAtThis
+		 * Cutscene Done!
+
+		*/
+
 		public float DistanceFromPlayer;
 
 		public float Sensitivity;
@@ -25,7 +35,7 @@ namespace WoVEssentials {
 
 
 
-		void Update () {
+		void FixedUpdate () {
 
 			FollowPos.y = FollowThis.transform.position.y + (DistanceFromPlayer / 2);
 			FollowPos.z = FollowThis.transform.position.z - DistanceFromPlayer;

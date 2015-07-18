@@ -48,6 +48,7 @@
   <ItemGroup>
      <Compile Include="Assets\Code\Camera\MainCameraFollow.cs" />
      <Compile Include="Assets\Code\Player\LinearMovement.cs" />
+     <Compile Include="Assets\Code\Player\Temp_Linear_Movement.cs" />
      <Compile Include="Assets\Code\Visual\ShowMouse.cs" />
      <None Include="Assets\_Private Work\Programmers\Create 1 File - use your name.txt" />
      <None Include="Assets\_Private Work\Writers\Create 1 File - use your name.txt" />
