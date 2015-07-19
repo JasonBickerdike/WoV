@@ -10,73 +10,70 @@ using System.Collections;
 namespace WoVEssentials
 {
 	/// <summary>
-	/// The player movement direction.
+	/// Handles linear movement for the player.
 	/// </summary>
-	public enum PlayerMovementDirection
-	{
-		Forward = 0,
-		Left,
-		Back,
-		Right,
-	}
-
 	public class LinearMovement : MonoBehaviour
 	{
 		/// <summary>
-		/// The player object.
+		/// The transformation speed of the player.
 		/// </summary>
-		private GameObject playerObject = null;
+		public float PlayerSpeed = 0.1f;
 
 		/// <summary>
-		/// The player walk speed.
+		/// The player speed modifier.
+		/// 
+		/// Useful for effects on the player speed
+		/// without modifying the base speed.
 		/// </summary>
-		public float playerBaseSpeed = 5.0f;
-		private float playerSpeed = 5.0f;
-
-		/// <summary>
-		/// The player sprint speed.
-		/// </summary>
-		public float playerSprintSpeedModifier = 2.5f;
-
-		/// <summary>
-		/// The player sneak speed.
-		/// </summary>
-		public float playerSneakSpeed = 1.0f;
-
-		/// <summary>
-		/// The current player direction.
-		/// </summary>
-		private PlayerMovementDirection playerDirection = PlayerMovementDirection.Forward;
-		public PlayerMovementDirection PlayerDirection {
-			get { return playerDirection; }
-			set { playerDirection = value; }
+		private float playerSpeedModifier = 1.0f;
+		public float PlayerSpeedModifier {
+			get { return playerSpeedModifier; }
+			set { playerSpeedModifier = value; }
 		}
 
 		/// <summary>
-		/// The auto move flag for the player.
+		/// The player sprint modifier.
 		/// </summary>
-		private bool enableAutoMove = false;
-		public bool EnableAutoMove {
-			get { return enableAutoMove; }
-			set { enableAutoMove = value; }
+		public float PlayerSprintModifier = 2.0f;
+
+		/// <summary>
+		/// The player sneak modifer.
+		/// </summary>
+		public float PlayerSneakModifer = 0.3f;
+
+		/// <summary>
+		/// The camera blend speed.
+		/// </summary>
+		public float BlendSpeed = 100f;
+
+		/// <summary>
+		/// The player position.
+		/// </summary>
+		public Vector3 PlayerPos = Vector2.zero;
+
+		public float TimeReq = 0;
+		public float CurTime = 0;
+
+		/// <summary>
+		/// The enable automove flag.
+		/// </summary>
+		private bool enableAutomove = false;
+		public bool EnableAutomove {
+			get { return enableAutomove; }
+			set { enableAutomove = value; }
 		}
 
 		/// <summary>
-		/// The sprint flag for the player.
-		/// </summary>
-		private bool enableSprint = false;
-		public bool EnableSprint {
-			get { return enableSprint; }
-			set { enableSprint = value; }
-		}
-
-		/// <summary>
-		/// The enable sprint lock.
+		/// The enable sprint flag.
 		/// </summary>
 		private bool enableSprintLock = false;
+		public bool EnableSprintLock {
+			get { return enableSprintLock; }
+			set { enableSprintLock = value; }
+		}
 
 		/// <summary>
-		/// The sneak flag for the player.
+		/// The enable sneak flag.
 		/// </summary>
 		private bool enableSneak = false;
 		public bool EnableSneak {
@@ -85,139 +82,131 @@ namespace WoVEssentials
 		}
 
 		/// <summary>
-		/// The player is moving.
+		/// Awake this instance.
 		/// </summary>
-		private bool isMoving = false;
-		public bool IsMoving {
-			get { return isMoving; }
-		}
-
-		/// <summary>
-		/// Start of this instance.
-		/// </summary>
-		public void Start ()
+		public void Awake ()
 		{
-			// Grab the player object.
-			playerObject = GameObject.FindGameObjectWithTag ("Player");
-
-			// Ensure we have a player game object.
-			if (playerObject == null) {
-				throw new UnityException ("The player object must be set!");
-			}
+			// Players Position
+			PlayerPos = this.transform.position;
 		}
 
 		/// <summary>
-		/// Update is called once per frame
+		/// Update this instance.
 		/// </summary>
 		public void Update ()
 		{
-			// Reset our moving flag.
-			playerSpeed = playerBaseSpeed;
+			// Handle any input keys that don't use the Input Manager.
+			HandleInputKeys ();
+		}
 
-			// Modify speed for case where we are sneaking.
-			if (EnableSneak) {
-				playerSpeed = playerSneakSpeed;
+		/// <summary>
+		/// Called every physics tick.
+		/// </summary>
+		public void FixedUpdate ()
+		{
+			PlayerPos.y = transform.position.y;
+				
+			// Handle the movement.
+			if (Input.GetAxis ("Vertical") > 0) {
+				HandleVerticalMovement ();
+			}
+			if (Input.GetAxis ("Vertical") < 0) {
+				HandleVerticalMovement (-1);
+			}
+			
+			if (Input.GetAxis ("Horizontal") < 0) {
+				HandleHorizontalMovement (-1);
+			}
+			if (Input.GetAxis ("Horizontal") > 0) {
+				HandleHorizontalMovement ();
 			}
 
-			// Modify speed for case where we should be running.
-			if (EnableSprint) {
-				playerSpeed += playerSprintSpeedModifier;
+			// Handle the automove.
+			if (EnableAutomove) {
+				HandleVerticalMovement (1, false);
 			}
 
-			// Move forward.
-			if (Input.GetKeyDown (KeyCode.W)) {
-				PlayerDirection = PlayerMovementDirection.Forward;
-				isMoving = true;
-			} else if (Input.GetKeyUp (KeyCode.W)) {
-				isMoving = false;
-			}
+			// Slowly move camera to that new position.
+			transform.position = Vector3.Lerp (
+				transform.position, 
+				PlayerPos, 
+				BlendSpeed * Time.deltaTime
+			);			
 
-			// Move left.
-			if (Input.GetKeyDown (KeyCode.A)) {
-				PlayerDirection = PlayerMovementDirection.Left;
-				isMoving = true;
-			} else if (Input.GetKeyUp (KeyCode.A)) {
-				isMoving = false;
-			}
+			PlayerPos = transform.position;
+		}
 
-			// Move back.
-			if (Input.GetKeyDown (KeyCode.S)) {
-				PlayerDirection = PlayerMovementDirection.Back;
-				isMoving = true;
-			} else if (Input.GetKeyUp (KeyCode.S)) {
-				isMoving = false;
-			}
-
-			// Move right.
-			if (Input.GetKeyDown (KeyCode.D)) {
-				PlayerDirection = PlayerMovementDirection.Right;
-				isMoving = true;
-			} else if (Input.GetKeyUp (KeyCode.D)) {
-				isMoving = false;
-			}
-
-			// Move the player.
-			HandleMovement ();
-
-			// Jump.
-			if (Input.GetKeyDown (KeyCode.Space)) {
-				// Handle jump call.
-			}
-
+		/// <summary>
+		/// Handles the input keys.
+		/// </summary>
+		protected void HandleInputKeys ()
+		{
 			// Enable/disable automove.
 			if (Input.GetKeyUp (KeyCode.X)) {
-				EnableAutoMove = !enableAutoMove;
+				EnableAutomove = !EnableAutomove;
 			}
 
 			// Enable/disable sprint.
 			if (Input.GetKey (KeyCode.CapsLock)) {
-				enableSprintLock = !enableSprintLock;
-			}
-
-			if (Input.GetKeyDown (KeyCode.LeftShift) || 
-				Input.GetKeyDown (KeyCode.RightShift)) {
-				EnableSprint = !enableSprint;
-			} else if ((Input.GetKeyUp (KeyCode.LeftShift) ||
-				Input.GetKeyUp (KeyCode.RightShift)) && !enableSprintLock) {
-				EnableSprint = false;
-			}
-
-			// If enableSprintLock is true we should sprint.
-			if (enableSprintLock) {
-				EnableSprint = true;
+				EnableSprintLock = !EnableSprintLock;
 			}
 
 			// Enable/disable sneak.
 			if (Input.GetKeyUp (KeyCode.LeftAlt)) {
 				EnableSneak = !enableSneak;
+
+				// Setup the player speed modifier.
+				if (EnableSneak) {
+					PlayerSpeedModifier = PlayerSneakModifer;
+				} else {
+					playerSpeedModifier = 1.0f;
+				}
+
+				// Let others know we've modified the speed.
+				// TODO: When we have effect modifiers in place.
+				// SendMessage ("PlayerSpeedModifierUpdate");
 			}
 		}
 
 		/// <summary>
-		/// Handles the movement.
+		/// Handles the vertical movement.
 		/// </summary>
-		protected void HandleMovement ()
+		/// <param name="Direction">Direction.</param>
+		protected void HandleVerticalMovement (int Direction = 1, bool disableAutoMove = true)
 		{
-			if (isMoving || EnableAutoMove) {
-				switch (PlayerDirection) {
-				case PlayerMovementDirection.Forward:
-					playerObject.transform.position += 
-						transform.forward * playerSpeed * Time.deltaTime;
-					break;
-				case PlayerMovementDirection.Left:
-					playerObject.transform.position -=
-						transform.right * playerSpeed * Time.deltaTime;
-					break;
-				case PlayerMovementDirection.Back:
-					playerObject.transform.position -= 
-						transform.forward * playerSpeed * Time.deltaTime;
-					break;
-				case PlayerMovementDirection.Right:
-					playerObject.transform.position +=
-						transform.right * playerSpeed * Time.deltaTime;
-					break;
-				}
+			// Set the new base player speed.
+			float newPlayerSpeed = PlayerSpeed * PlayerSpeedModifier;
+
+			// Modify the position.
+			if (!Input.GetButton ("Sprint") && !enableSprintLock) {
+				PlayerPos += (transform.forward * newPlayerSpeed) * Direction;
+			} else {
+				PlayerPos += (transform.forward * (newPlayerSpeed * PlayerSprintModifier)) * Direction;
 			}
+
+			// Disable the automove.
+			if (disableAutoMove) {
+				EnableAutomove = false;
+			}
+		}
+
+		/// <summary>
+		/// Handles the horizontal movement.
+		/// </summary>
+		/// <param name="Direction">Direction.</param>
+		protected void HandleHorizontalMovement (int Direction = 1)
+		{
+			// Set the new base player speed.
+			float newPlayerSpeed = PlayerSpeed * PlayerSpeedModifier;
+
+			if (!Input.GetButton ("Sprint") && !enableSprintLock) {
+				PlayerPos += (transform.right * newPlayerSpeed) * Direction;
+			} else {
+				PlayerPos += (transform.right * (newPlayerSpeed * PlayerSprintModifier)) * Direction;
+			}
+
+			// Disable the automove.
+			EnableAutomove = false;
 		}
 	}
 }
