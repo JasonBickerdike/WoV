@@ -8,7 +8,7 @@ namespace WoVEssentials {
 		/* How To Interact With This Script!!! *\
 
 		 * Cutscenes should use a gameobject with lerp to move around
-		 * Set a reference to this script on it's *Awake* to MainCameraFollow.FollowThis
+		 * Set the object script to MainCameraFollow.FollowThis
 		 * Set a child to the object it follows to set the direction the camera will look at
 		 * Set the child *LookAt* object to MainCameraFollow.LookAtThis
 		 * Cutscene Done!
@@ -19,13 +19,20 @@ namespace WoVEssentials {
 
 		public float Sensitivity;
 		public float BlendSpeed;
+		float DefaultSpeed;
 		// This will allow us to add angle to the camera in the editor
 		public Vector3 CamRotMod;
 		public Vector3 LookRot;
 
-		// Left this open so we can change it in game, useful for Cutscenes!
+		// This is what it actually Will Follow!
 		public GameObject FollowThis;
 		public GameObject LookAtThis;
+
+		// Camera Positions
+		public GameObject ThirdPersonFollow;
+		public GameObject ThirdPersonLook;
+		public GameObject FirstPersonFollow;
+		public GameObject FirstPersonLook;
 
 		Vector3 FollowPos;
 		Vector3 NewPos;
@@ -33,6 +40,30 @@ namespace WoVEssentials {
 
 		RaycastHit hit;
 
+		void Awake() {
+			DefaultSpeed = BlendSpeed;
+		}
+
+		void Update() {
+			if (Input.GetButtonDown ("SwitchCam")) {
+				Invoke ("ToggleCam",0);
+			}
+		}
+
+		void ToggleCam() {
+			if (FollowThis == FirstPersonFollow){
+				Debug.Log ("SwitchCam 1st");
+				FollowThis = ThirdPersonFollow;
+				LookAtThis = ThirdPersonLook;
+				BlendSpeed = DefaultSpeed;
+			}
+			else if (FollowThis == ThirdPersonFollow){
+				Debug.Log ("SwitchCam 3rd");
+				FollowThis = FirstPersonFollow;
+				LookAtThis = FirstPersonLook;
+				BlendSpeed = DefaultSpeed * 100;
+			}
+		}
 
 
 		void FixedUpdate () {
@@ -92,7 +123,7 @@ namespace WoVEssentials {
 				transform.rotation = Quaternion.Lerp (transform.rotation, lookAtRotation, 5.0F * Time.deltaTime);
 			}
 
-			if (Input.GetButton ("Look") && LookAtThis.name == "Head") {
+			if (Input.GetButton ("Look") && LookAtThis.name == "Head_Object" || LookAtThis.name == "Head_Front") {
 	//			Debug.Log ("Looking");
 				if(Input.GetAxis("Mouse X")<0 && LookRot.y < 40){
 					//Code for action on mouse moving left
